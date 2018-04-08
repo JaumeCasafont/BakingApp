@@ -20,7 +20,7 @@ public class RecipesListViewModel extends ViewModel {
     }
 
     public Flowable<List<Recipe>> getRecipes() {
-        return mDataSource.getRecipies()
+        return mDataSource.getRecipes()
                 .map(recipes -> {
                     mRecipes = recipes;
                     return mRecipes;

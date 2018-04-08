@@ -26,7 +26,7 @@ public class RecipesDataSource implements RecipeService {
     }
 
     @Override
-    public Flowable<List<Recipe>> getRecipies() {
-        return mRecipeService.getRecipies();
+    public Flowable<List<Recipe>> getRecipes() {
+        return mRecipeService.getRecipes();
     }
 }
