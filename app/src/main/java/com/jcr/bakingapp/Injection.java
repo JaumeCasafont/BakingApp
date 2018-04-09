@@ -1,6 +1,6 @@
 package com.jcr.bakingapp;
 
-import com.jcr.bakingapp.data.network.RecipesDataSource;
+import com.jcr.bakingapp.data.network.RecipesNetworkDataSource;
 import com.jcr.bakingapp.ui.recipes.RecipesListViewModelFactory;
 
 /**
@@ -9,6 +9,6 @@ import com.jcr.bakingapp.ui.recipes.RecipesListViewModelFactory;
 public class Injection {
 
     public static RecipesListViewModelFactory provideRecipesListViewModel() {
-        return new RecipesListViewModelFactory(new RecipesDataSource());
+        return new RecipesListViewModelFactory(new RecipesNetworkDataSource());
     }
 }

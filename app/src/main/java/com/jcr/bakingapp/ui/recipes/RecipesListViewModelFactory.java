@@ -3,13 +3,13 @@ package com.jcr.bakingapp.ui.recipes;
 import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
 
-import com.jcr.bakingapp.data.network.RecipesDataSource;
+import com.jcr.bakingapp.data.network.RecipesNetworkDataSource;
 
 public class RecipesListViewModelFactory extends ViewModelProvider.NewInstanceFactory {
 
-    private final RecipesDataSource mDataSource;
+    private final RecipesNetworkDataSource mDataSource;
 
-    public RecipesListViewModelFactory(RecipesDataSource dataSource) {
+    public RecipesListViewModelFactory(RecipesNetworkDataSource dataSource) {
         this.mDataSource = dataSource;
     }
 

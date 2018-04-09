@@ -1,12 +1,19 @@
 package com.jcr.bakingapp.data.models;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.NonNull;
+
 import java.util.List;
 
+@Entity(tableName = "Recipes")
 public class Recipe {
 	private String image;
 	private int servings;
 	private String name;
 	private List<Ingredients> ingredients;
+	@NonNull
+	@PrimaryKey
 	private int id;
 	private List<Step> steps;
 
