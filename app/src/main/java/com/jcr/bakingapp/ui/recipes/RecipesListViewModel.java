@@ -2,6 +2,7 @@ package com.jcr.bakingapp.ui.recipes;
 
 import android.arch.lifecycle.ViewModel;
 
+import com.jcr.bakingapp.data.RecipesRepository;
 import com.jcr.bakingapp.data.models.Recipe;
 import com.jcr.bakingapp.data.network.RecipesNetworkDataSource;
 
@@ -11,19 +12,20 @@ import io.reactivex.Flowable;
 
 public class RecipesListViewModel extends ViewModel {
 
-    private final RecipesNetworkDataSource mDataSource;
+    private final RecipesRepository mRepository;
 
     private List<Recipe> mRecipes;
 
-    public RecipesListViewModel(RecipesNetworkDataSource dataSource) {
-        mDataSource = dataSource;
+    public RecipesListViewModel(RecipesRepository repository) {
+        mRepository = repository;
     }
 
-    public Flowable<List<Recipe>> getRecipes() {
-        return mDataSource.getRecipes()
+    public Flowable<List<Recipe>> getRecipesList() {
+        return mRepository.getRecipesList()
                 .map(recipes -> {
                     mRecipes = recipes;
                     return mRecipes;
+
                 });
     }
 }

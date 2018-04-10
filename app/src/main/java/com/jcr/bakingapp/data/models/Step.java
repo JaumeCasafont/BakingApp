@@ -7,6 +7,14 @@ public class Step {
 	private String shortDescription;
 	private String thumbnailURL;
 
+	public Step(String videoURL, String description, int id, String shortDescription, String thumbnailURL) {
+		this.videoURL = videoURL;
+		this.description = description;
+		this.id = id;
+		this.shortDescription = shortDescription;
+		this.thumbnailURL = thumbnailURL;
+	}
+
 	public void setVideoURL(String videoURL){
 		this.videoURL = videoURL;
 	}

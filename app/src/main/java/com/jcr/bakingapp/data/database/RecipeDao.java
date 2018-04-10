@@ -15,7 +15,7 @@ import io.reactivex.Flowable;
 public interface RecipeDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void bulkInsert(Recipe... project);
+    void bulkInsert(List<Recipe> recipes);
 
     @Query("SELECT * FROM Recipes")
     Flowable<List<Recipe>> getRecipes();

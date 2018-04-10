@@ -56,17 +56,26 @@ public class RecipesListActivity extends AppCompatActivity {
     }
 
     private void initViewModel() {
-        RecipesListViewModelFactory factory = Injection.provideRecipesListViewModel();
+        RecipesListViewModelFactory factory = Injection.provideRecipesListViewModel(this);
         mViewModel = ViewModelProviders.of(this, factory).get(RecipesListViewModel.class);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        mDisposable.add(mViewModel.getRecipes()
+
+        mDisposable.add(mViewModel.getRecipesList()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(recipes -> mAdapter.swapRecipes(recipes)));
         mBinding.executePendingBindings();
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        mDisposable.clear();
+    }
+
 }

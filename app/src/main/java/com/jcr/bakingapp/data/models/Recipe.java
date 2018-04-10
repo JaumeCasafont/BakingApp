@@ -17,6 +17,15 @@ public class Recipe {
 	private int id;
 	private List<Step> steps;
 
+	public Recipe(String image, int servings, String name, List<Ingredients> ingredients, @NonNull int id, List<Step> steps) {
+		this.image = image;
+		this.servings = servings;
+		this.name = name;
+		this.ingredients = ingredients;
+		this.id = id;
+		this.steps = steps;
+	}
+
 	public void setImage(String image){
 		this.image = image;
 	}
