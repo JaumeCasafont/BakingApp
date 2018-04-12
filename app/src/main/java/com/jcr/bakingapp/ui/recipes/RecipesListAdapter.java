@@ -16,11 +16,13 @@ import java.util.List;
 public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.RecipeViewHolder> {
 
     private final Context mContext;
+    private final OnClickHandler mClickHandler;
 
     private List<Recipe> mRecipes;
 
-    RecipesListAdapter(@NonNull Context context) {
+    RecipesListAdapter(@NonNull Context context, OnClickHandler handler) {
         this.mContext = context;
+        this.mClickHandler = handler;
     }
 
 
@@ -36,7 +38,13 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull RecipeViewHolder holder, int position) {
-        holder.bind(mRecipes.get(position));
+        Recipe recipe = mRecipes.get(position);
+        holder.bind(recipe);
+        holder.mBinding.getRoot().setOnClickListener(view -> {
+            if (mClickHandler != null && recipe != null) {
+                mClickHandler.onClick(recipe.getId());
+            }
+        });
     }
 
     @Override
@@ -48,6 +56,10 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
     void swapRecipes(final List<Recipe> recipes) {
         mRecipes = recipes;
         notifyDataSetChanged();
+    }
+
+    interface OnClickHandler {
+        void onClick(int id);
     }
 
     class RecipeViewHolder extends RecyclerView.ViewHolder {

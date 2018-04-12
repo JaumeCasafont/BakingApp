@@ -1,10 +1,11 @@
-package com.jcr.bakingapp;
+package com.jcr.bakingapp.database;
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule;
 import android.arch.persistence.room.Room;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.jcr.bakingapp.TestUtil;
 import com.jcr.bakingapp.data.database.RecipesDatabase;
 import com.jcr.bakingapp.data.models.Recipe;
 

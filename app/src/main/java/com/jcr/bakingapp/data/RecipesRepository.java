@@ -7,6 +7,7 @@ import com.jcr.bakingapp.data.network.RecipesNetworkDataSource;
 import java.util.List;
 
 import io.reactivex.Flowable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
 public class RecipesRepository {
@@ -34,19 +35,19 @@ public class RecipesRepository {
         return sInstance;
     }
 
-    private void initializeData() {
-        if (!mInitialized) {
-            mNetworkDataSource.getRecipes()
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(Schedulers.io())
-                    .subscribe(mDao::bulkInsert);
-            mInitialized = true;
-        }
-    }
-
     public Flowable<List<Recipe>> getRecipesList() {
-        initializeData();
-        return mDao.getRecipes();
+        return mDao.getRecipes()
+                .flatMap(localResult -> {
+                    if (localResult.isEmpty()) {
+                        return mNetworkDataSource.getRecipes()
+                                .subscribeOn(Schedulers.io())
+                                .doOnNext(mDao::bulkInsert).flatMap(
+                                        x -> mDao.getRecipes())
+                                .observeOn(AndroidSchedulers.mainThread());
+                    } else {
+                        return Flowable.just(localResult);
+                    }
+                });
     }
 }
 
