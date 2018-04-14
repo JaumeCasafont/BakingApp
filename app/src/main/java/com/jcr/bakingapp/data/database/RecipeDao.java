@@ -18,6 +18,8 @@ public interface RecipeDao {
     void bulkInsert(List<Recipe> recipes);
 
     @Query("SELECT * FROM Recipes")
-    Flowable<List<Recipe>> getRecipes();
+    Flowable<List<Recipe>> getRecipesList();
 
+    @Query("SELECT * FROM Recipes WHERE id = :recipeId")
+    Flowable<Recipe> getRecipe(int recipeId);
 }

@@ -10,5 +10,5 @@ import retrofit2.http.GET;
 public interface RecipeService {
 
     @GET("baking.json")
-    Flowable<List<Recipe>> getRecipes();
+    Flowable<List<Recipe>> getRecipesList();
 }

@@ -57,7 +57,7 @@ public class RecipeDaoTest {
         }
 
         // When subscribing to the emissions of the recipes
-        mDatabase.recipeDao().getRecipes()
+        mDatabase.recipeDao().getRecipesList()
                 .test()
                 // assertValue asserts that there was only one emission of the user
                 .assertValue(recipes -> {

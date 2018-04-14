@@ -6,6 +6,7 @@ import com.jcr.bakingapp.data.RecipesRepository;
 import com.jcr.bakingapp.data.database.RecipesDatabase;
 import com.jcr.bakingapp.data.network.RecipesNetworkDataSource;
 import com.jcr.bakingapp.ui.recipes.RecipesListViewModelFactory;
+import com.jcr.bakingapp.ui.steps.StepsListViewModelFactory;
 
 /**
  * Enables injection of data sources.
@@ -20,6 +21,10 @@ public class Injection {
 
     public static RecipesListViewModelFactory provideRecipesListViewModel(Context context) {
         return new RecipesListViewModelFactory(provideRepository(context));
+    }
+
+    public static StepsListViewModelFactory provideStepsListViewModel(Context context, int id) {
+        return new StepsListViewModelFactory(provideRepository(context), id);
     }
 
 }

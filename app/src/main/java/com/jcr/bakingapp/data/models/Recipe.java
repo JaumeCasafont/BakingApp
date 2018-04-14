@@ -11,13 +11,13 @@ public class Recipe {
 	private String image;
 	private int servings;
 	private String name;
-	private List<Ingredients> ingredients;
+	private List<Ingredient> ingredients;
 	@NonNull
 	@PrimaryKey
 	private int id;
 	private List<Step> steps;
 
-	public Recipe(String image, int servings, String name, List<Ingredients> ingredients, @NonNull int id, List<Step> steps) {
+	public Recipe(String image, int servings, String name, List<Ingredient> ingredients, @NonNull int id, List<Step> steps) {
 		this.image = image;
 		this.servings = servings;
 		this.name = name;
@@ -50,11 +50,11 @@ public class Recipe {
 		return name;
 	}
 
-	public void setIngredients(List<Ingredients> ingredients){
+	public void setIngredients(List<Ingredient> ingredients){
 		this.ingredients = ingredients;
 	}
 
-	public List<Ingredients> getIngredients(){
+	public List<Ingredient> getIngredients(){
 		return ingredients;
 	}
 

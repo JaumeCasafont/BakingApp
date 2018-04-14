@@ -1,6 +1,6 @@
 package com.jcr.bakingapp;
 
-import com.jcr.bakingapp.data.models.Ingredients;
+import com.jcr.bakingapp.data.models.Ingredient;
 import com.jcr.bakingapp.data.models.Recipe;
 import com.jcr.bakingapp.data.models.Step;
 
@@ -22,12 +22,12 @@ public class TestUtil {
         return repos;
     }
 
-    public static Ingredients createIngredient(String name) {
-        return new Ingredients(1, null, name);
+    public static Ingredient createIngredient(String name) {
+        return new Ingredient(1, null, name);
     }
 
-    public static List<Ingredients> createIngredients(int count, String name) {
-        List<Ingredients> ingredients = new ArrayList<>();
+    public static List<Ingredient> createIngredients(int count, String name) {
+        List<Ingredient> ingredients = new ArrayList<>();
         for(int i = 0; i < count; i ++) {
             ingredients.add(createIngredient(name + i));
         }

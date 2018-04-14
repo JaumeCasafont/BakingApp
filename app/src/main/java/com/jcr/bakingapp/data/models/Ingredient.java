@@ -1,11 +1,11 @@
 package com.jcr.bakingapp.data.models;
 
-public class Ingredients {
+public class Ingredient {
 	private float quantity;
 	private String measure;
 	private String ingredient;
 
-	public Ingredients(float quantity, String measure, String ingredient) {
+	public Ingredient(float quantity, String measure, String ingredient) {
 		this.quantity = quantity;
 		this.measure = measure;
 		this.ingredient = ingredient;
@@ -37,11 +37,6 @@ public class Ingredients {
 
 	@Override
  	public String toString(){
-		return 
-			"Ingredients{" +
-			"quantity = '" + quantity + '\'' + 
-			",measure = '" + measure + '\'' + 
-			",ingredient = '" + ingredient + '\'' + 
-			"}";
+		return ingredient + " (" + quantity + " " + measure + ")";
 		}
 }

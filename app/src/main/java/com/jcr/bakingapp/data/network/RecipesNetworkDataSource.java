@@ -42,7 +42,7 @@ public class RecipesNetworkDataSource {
         return sInstance;
     }
 
-    public Flowable<List<Recipe>> getRecipes() {
-        return mRecipeService.getRecipes();
+    public Flowable<List<Recipe>> getRecipesList() {
+        return mRecipeService.getRecipesList();
     }
 }

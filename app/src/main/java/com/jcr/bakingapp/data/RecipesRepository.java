@@ -36,18 +36,14 @@ public class RecipesRepository {
     }
 
     public Flowable<List<Recipe>> getRecipesList() {
-        return mDao.getRecipes()
-                .flatMap(localResult -> {
-                    if (localResult.isEmpty()) {
-                        return mNetworkDataSource.getRecipes()
-                                .subscribeOn(Schedulers.io())
-                                .doOnNext(mDao::bulkInsert).flatMap(
-                                        x -> mDao.getRecipes())
-                                .observeOn(AndroidSchedulers.mainThread());
-                    } else {
-                        return Flowable.just(localResult);
-                    }
-                });
+        return mNetworkDataSource.getRecipesList()
+                .subscribeOn(Schedulers.io())
+                .doOnNext(mDao::bulkInsert)
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public Flowable<Recipe> getRecipe(int recipeId) {
+        return mDao.getRecipe(recipeId);
     }
 }
 

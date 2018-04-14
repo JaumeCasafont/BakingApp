@@ -14,18 +14,14 @@ public class RecipesListViewModel extends ViewModel {
 
     private final RecipesRepository mRepository;
 
-    private List<Recipe> mRecipes;
+    private Flowable<List<Recipe>> mRecipes;
 
     public RecipesListViewModel(RecipesRepository repository) {
         mRepository = repository;
+        mRecipes = mRepository.getRecipesList();
     }
 
     public Flowable<List<Recipe>> getRecipesList() {
-        return mRepository.getRecipesList()
-                .map(recipes -> {
-                    mRecipes = recipes;
-                    return mRecipes;
-
-                });
+        return mRecipes;
     }
 }
