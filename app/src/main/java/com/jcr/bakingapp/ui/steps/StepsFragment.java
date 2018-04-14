@@ -58,7 +58,7 @@ public class StepsFragment extends Fragment {
     }
 
     private void initRecyclerView() {
-        mAdapter = new StepsAdapter(getContext());
+        mAdapter = new StepsAdapter(getContext(), null);
         mBinding.stepsLayout.stepsRv.setLayoutManager(new LinearLayoutManager(
                 getContext(), LinearLayoutManager.VERTICAL, false));
         mBinding.stepsLayout.stepsRv.setAdapter(mAdapter);

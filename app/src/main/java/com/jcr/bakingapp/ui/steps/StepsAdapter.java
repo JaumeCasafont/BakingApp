@@ -16,11 +16,13 @@ import java.util.List;
 public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.StepViewHolder> {
 
     private final Context mContext;
+    private final OnStepClickHandler mClickHanlder;
 
     private List<Step> mSteps;
 
-    public StepsAdapter(Context context) {
+    public StepsAdapter(Context context, OnStepClickHandler handler) {
         mContext = context;
+        mClickHanlder = handler;
     }
 
     @NonNull
@@ -32,7 +34,13 @@ public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.StepViewHold
 
     @Override
     public void onBindViewHolder(@NonNull StepViewHolder holder, int position) {
-        holder.stepShortDescription.setText(mSteps.get(position).getShortDescription());
+        Step step = mSteps.get(position);
+        holder.stepShortDescription.setText(step.getShortDescription());
+        holder.itemView.setOnClickListener(view -> {
+            if (mClickHanlder != null) {
+               mClickHanlder.onClick(step);
+            }
+        });
     }
 
     @Override
@@ -44,6 +52,10 @@ public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.StepViewHold
     public void setSteps(List<Step> steps) {
         mSteps = steps;
         notifyDataSetChanged();
+    }
+
+    interface OnStepClickHandler {
+        void onClick(Step step);
     }
 
     class StepViewHolder extends RecyclerView.ViewHolder {
