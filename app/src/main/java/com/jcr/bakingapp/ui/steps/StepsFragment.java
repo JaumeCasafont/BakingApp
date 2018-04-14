@@ -59,9 +59,9 @@ public class StepsFragment extends Fragment {
 
     private void initRecyclerView() {
         mAdapter = new StepsAdapter(getContext());
-        mBinding.stepsRv.setLayoutManager(new LinearLayoutManager(
+        mBinding.stepsLayout.stepsRv.setLayoutManager(new LinearLayoutManager(
                 getContext(), LinearLayoutManager.VERTICAL, false));
-        mBinding.stepsRv.setAdapter(mAdapter);
+        mBinding.stepsLayout.stepsRv.setAdapter(mAdapter);
     }
 
     @Override
@@ -77,7 +77,7 @@ public class StepsFragment extends Fragment {
     private void bindRecipe(Recipe recipe) {
         ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(recipe.getName());
         for (Ingredient ingredient : recipe.getIngredients()) {
-            mBinding.ingredientsTv.append("· " + ingredient.toString() + "\n");
+            mBinding.ingredientsLayout.ingredientsTv.append("· " + ingredient.toString() + "\n");
         }
         mAdapter.setSteps(recipe.getSteps());
     }
