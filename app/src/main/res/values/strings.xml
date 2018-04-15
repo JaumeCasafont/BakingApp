@@ -3,4 +3,6 @@
     <string name="servings_text">Servings %s</string>
     <string name="ingredients_title">Ingredients:</string>
     <string name="steps_title">Steps:</string>
+
+    <string name="steps_detail">Details</string>
 </resources>
