@@ -1,6 +1,7 @@
 package com.jcr.bakingapp.ui.steps;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -26,11 +27,29 @@ import static com.jcr.bakingapp.ui.recipes.RecipesListActivity.EXTRA_RECIPE_ID;
 
 public class StepsFragment extends Fragment {
 
+    OnStepClickCallback mCallback;
+
     private FragmentStepsBinding mBinding;
     private StepsListViewModel mViewModel;
     private StepsAdapter mAdapter;
 
     private final CompositeDisposable mDisposable = new CompositeDisposable();
+
+    public interface OnStepClickCallback {
+        void onStepSelected(int stepId);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        try {
+            mCallback = (OnStepClickCallback) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString()
+                    + " must implement OnStepClickCallback");
+        }
+    }
 
     public StepsFragment() {
     }
@@ -58,7 +77,7 @@ public class StepsFragment extends Fragment {
     }
 
     private void initRecyclerView() {
-        mAdapter = new StepsAdapter(getContext(), null);
+        mAdapter = new StepsAdapter(getContext(), stepId -> mCallback.onStepSelected(stepId));
         mBinding.stepsLayout.stepsRv.setLayoutManager(new LinearLayoutManager(
                 getContext(), LinearLayoutManager.VERTICAL, false));
         mBinding.stepsLayout.stepsRv.setAdapter(mAdapter);

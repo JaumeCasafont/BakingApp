@@ -5,6 +5,8 @@ import android.content.Context;
 import com.jcr.bakingapp.data.RecipesRepository;
 import com.jcr.bakingapp.data.database.RecipesDatabase;
 import com.jcr.bakingapp.data.network.RecipesNetworkDataSource;
+import com.jcr.bakingapp.ui.detail.StepDetailViewModel;
+import com.jcr.bakingapp.ui.detail.StepDetailViewModelFactory;
 import com.jcr.bakingapp.ui.recipes.RecipesListViewModelFactory;
 import com.jcr.bakingapp.ui.steps.StepsListViewModelFactory;
 
@@ -25,6 +27,11 @@ public class Injection {
 
     public static StepsListViewModelFactory provideStepsListViewModel(Context context, int id) {
         return new StepsListViewModelFactory(provideRepository(context), id);
+    }
+
+    public static StepDetailViewModelFactory provideStepDetailViewModel(Context context, int recipeId,
+                                                                       int stepId) {
+        return new StepDetailViewModelFactory(provideRepository(context), recipeId, stepId);
     }
 
 }

@@ -2,6 +2,7 @@ package com.jcr.bakingapp.data;
 
 import com.jcr.bakingapp.data.database.RecipeDao;
 import com.jcr.bakingapp.data.models.Recipe;
+import com.jcr.bakingapp.data.models.Step;
 import com.jcr.bakingapp.data.network.RecipesNetworkDataSource;
 
 import java.util.List;
@@ -44,6 +45,11 @@ public class RecipesRepository {
 
     public Flowable<Recipe> getRecipe(int recipeId) {
         return mDao.getRecipe(recipeId);
+    }
+
+    public Flowable<Step> getStep(int recipeId, int stepId) {
+        return mDao.getRecipe(recipeId)
+                .map(recipe -> recipe.getSteps().get(stepId));
     }
 }
 
