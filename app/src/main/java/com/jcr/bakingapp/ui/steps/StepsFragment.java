@@ -77,10 +77,29 @@ public class StepsFragment extends Fragment {
     }
 
     private void initRecyclerView() {
-        mAdapter = new StepsAdapter(getContext(), stepId -> mCallback.onStepSelected(stepId));
+        mAdapter = new StepsAdapter(getContext(), this::onStepSelected);
         mBinding.stepsLayout.stepsRv.setLayoutManager(new LinearLayoutManager(
                 getContext(), LinearLayoutManager.VERTICAL, false));
         mBinding.stepsLayout.stepsRv.setAdapter(mAdapter);
+    }
+
+    private void onStepSelected(int stepId) {
+        if (getResources().getBoolean(R.bool.isTablet)) {
+            restoreColors();
+            setStepItemColor(stepId, R.color.colorPrimaryLight);
+        }
+        mCallback.onStepSelected(stepId);
+    }
+
+    private void restoreColors() {
+        for (int i = 0; i < mAdapter.getItemCount(); i++) {
+            setStepItemColor(i, R.color.colorPrimary);
+        }
+    }
+
+    private void setStepItemColor(int step, int color) {
+        mBinding.stepsLayout.stepsRv.getLayoutManager().findViewByPosition(step)
+                .setBackgroundColor(getResources().getColor(color));
     }
 
     @Override
@@ -95,6 +114,7 @@ public class StepsFragment extends Fragment {
 
     private void bindRecipe(Recipe recipe) {
         ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(recipe.getName());
+        mBinding.ingredientsLayout.ingredientsTv.setText("");
         for (Ingredient ingredient : recipe.getIngredients()) {
             mBinding.ingredientsLayout.ingredientsTv.append("· " + ingredient.toString() + "\n");
         }
