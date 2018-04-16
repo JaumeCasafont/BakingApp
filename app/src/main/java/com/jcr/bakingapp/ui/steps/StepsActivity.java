@@ -24,7 +24,7 @@ public class StepsActivity extends AppCompatActivity implements StepsFragment.On
 
         mRecipeId = getIntent().getIntExtra(EXTRA_RECIPE_ID, 0);
 
-        if (getResources().getBoolean(R.bool.isTablet)) {
+        if (getResources().getBoolean(R.bool.isTablet) && savedInstanceState == null) {
             showStepDetailFragment(0);
         }
     }

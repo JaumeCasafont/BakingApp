@@ -12,6 +12,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 
 import com.jcr.bakingapp.Injection;
 import com.jcr.bakingapp.R;
@@ -27,11 +28,14 @@ import static com.jcr.bakingapp.ui.recipes.RecipesListActivity.EXTRA_RECIPE_ID;
 
 public class StepsFragment extends Fragment {
 
+    private final static String STEP_ID = "step_id";
+
     OnStepClickCallback mCallback;
 
     private FragmentStepsBinding mBinding;
     private StepsListViewModel mViewModel;
     private StepsAdapter mAdapter;
+    private int mStepId;
 
     private final CompositeDisposable mDisposable = new CompositeDisposable();
 
@@ -52,6 +56,15 @@ public class StepsFragment extends Fragment {
     }
 
     public StepsFragment() {
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if (savedInstanceState != null) {
+            mStepId = savedInstanceState.getInt(STEP_ID, 0);
+        }
     }
 
     @Nullable
@@ -84,6 +97,7 @@ public class StepsFragment extends Fragment {
     }
 
     private void onStepSelected(int stepId) {
+        mStepId = stepId;
         if (getResources().getBoolean(R.bool.isTablet)) {
             restoreColors();
             setStepItemColor(stepId, R.color.colorPrimaryLight);
@@ -119,6 +133,10 @@ public class StepsFragment extends Fragment {
             mBinding.ingredientsLayout.ingredientsTv.append("· " + ingredient.toString() + "\n");
         }
         mAdapter.setSteps(recipe.getSteps());
+        if (getResources().getBoolean(R.bool.isTablet)) {
+            mBinding.stepsLayout.stepsRv.getViewTreeObserver().addOnGlobalLayoutListener(
+                    () -> setStepItemColor(mStepId, R.color.colorPrimaryLight));
+        }
     }
 
     @Override
@@ -126,5 +144,11 @@ public class StepsFragment extends Fragment {
         super.onStop();
 
         mDisposable.clear();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(STEP_ID, mStepId);
     }
 }

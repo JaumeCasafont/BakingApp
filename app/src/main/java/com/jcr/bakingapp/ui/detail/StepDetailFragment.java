@@ -56,6 +56,7 @@ public class StepDetailFragment extends Fragment {
     private BandwidthMeter bandwidthMeter;
     private DefaultTrackSelector trackSelector;
     private boolean shouldAutoPlay;
+    private long mPlayerPosition;
 
     private final CompositeDisposable mDisposable = new CompositeDisposable();
 
@@ -74,6 +75,9 @@ public class StepDetailFragment extends Fragment {
         mediaDataSourceFactory = new DefaultDataSourceFactory(mContext,
                 Util.getUserAgent(mContext, "BakingApp"),
                 (TransferListener<? super DataSource>) bandwidthMeter);
+        if (savedInstanceState != null) {
+            mPlayerPosition = savedInstanceState.getLong(STATE_PLAYER_POSITION);
+        }
     }
 
     @Nullable
@@ -101,19 +105,25 @@ public class StepDetailFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+        if (Util.SDK_INT > 23) {
+            initDisposable();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if ((Util.SDK_INT <= 23)) {
+            initDisposable();
+        }
+    }
+
+    private void initDisposable() {
         mDisposable.add(mViewModel.getStep()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::bindStep));
         mBinding.executePendingBindings();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        releasePlayer();
-        mDisposable.clear();
     }
 
     private void bindStep(Step step) {
@@ -125,7 +135,7 @@ public class StepDetailFragment extends Fragment {
         if (videoUrl == null || videoUrl.isEmpty()) {
             mBinding.playerView.setVisibility(View.GONE);
         } else {
-            initializePlayer(videoUrl);
+            initializePlayer();
         }
     }
 
@@ -133,24 +143,53 @@ public class StepDetailFragment extends Fragment {
         mStepId = stepId;
     }
 
-    private void initializePlayer(String videoUrl) {
-        TrackSelection.Factory videoTrackSelectionFactory =
-                new AdaptiveTrackSelection.Factory(bandwidthMeter);
+    private void initializePlayer() {
+        if (mExoPlayer == null) {
+            TrackSelection.Factory videoTrackSelectionFactory =
+                    new AdaptiveTrackSelection.Factory(bandwidthMeter);
 
-        trackSelector = new DefaultTrackSelector(videoTrackSelectionFactory);
+            trackSelector = new DefaultTrackSelector(videoTrackSelectionFactory);
 
-        mExoPlayer = ExoPlayerFactory.newSimpleInstance(mContext, trackSelector);
+            mExoPlayer = ExoPlayerFactory.newSimpleInstance(mContext, trackSelector);
 
-        mBinding.playerView.setPlayer(mExoPlayer);
+            mBinding.playerView.setPlayer(mExoPlayer);
 
-        mExoPlayer.setPlayWhenReady(shouldAutoPlay);
+            mExoPlayer.setPlayWhenReady(shouldAutoPlay);
 
-        DefaultExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
+            DefaultExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
 
-        MediaSource mediaSource = new ExtractorMediaSource(Uri.parse(videoUrl),
-                mediaDataSourceFactory, extractorsFactory, null, null);
+            MediaSource mediaSource = new ExtractorMediaSource(Uri.parse(mViewModel.getVideoUrl()),
+                    mediaDataSourceFactory, extractorsFactory, null, null);
 
-        mExoPlayer.prepare(mediaSource);
+            mExoPlayer.seekTo(mPlayerPosition);
+            mExoPlayer.prepare(mediaSource);
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (mExoPlayer != null) {
+            mPlayerPosition = mExoPlayer.getCurrentPosition();
+        }
+        if (Util.SDK_INT <= 23) {
+            releasePlayer();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (Util.SDK_INT > 23) {
+            releasePlayer();
+        }
+        mDisposable.clear();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putLong(STATE_PLAYER_POSITION, mPlayerPosition);
     }
 
     private void releasePlayer() {

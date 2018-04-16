@@ -15,7 +15,9 @@ public class StepDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_step_detail);
 
-        showStepDetailFragment();
+        if (savedInstanceState == null) {
+            showStepDetailFragment();
+        }
     }
 
     @Override
