@@ -3,21 +3,20 @@ package com.jcr.bakingapp.ui.detail;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Config;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlayerFactory;
-import com.google.android.exoplayer2.LoadControl;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
@@ -25,8 +24,6 @@ import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
-import com.google.android.exoplayer2.trackselection.TrackSelector;
-import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.BandwidthMeter;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
@@ -37,12 +34,13 @@ import com.jcr.bakingapp.Injection;
 import com.jcr.bakingapp.R;
 import com.jcr.bakingapp.data.models.Step;
 import com.jcr.bakingapp.databinding.FragmentStepDetailBinding;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 
-import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
 import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
 import static com.jcr.bakingapp.ui.recipes.RecipesListActivity.EXTRA_RECIPE_ID;
 
@@ -131,30 +129,59 @@ public class StepDetailFragment extends Fragment {
     }
 
     private void bindStep(Step step) {
+        bindTexts(step.getShortDescription(), step.getDescription());
+
+        bindThumbnailImage(step.getThumbnailURL());
+
+        bindPlayer(step.getVideoURL());
+    }
+
+    private void bindTexts(String shortDescription, String description) {
         if (getResources().getBoolean(R.bool.isTablet)) {
-            mBinding.stepDescription.setText(step.getDescription());
+            mBinding.stepDescription.setText(description);
         } else {
             ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(String.format(
-                    getString(R.string.steps_detail_toolbar), String.valueOf(step.getId())));
+                    getString(R.string.steps_detail_toolbar), shortDescription));
             if (getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT) {
-                mBinding.stepShortDescription.setText(step.getShortDescription());
-                mBinding.stepDescription.setText(step.getDescription());
+                mBinding.stepDescription.setText(description);
+            } else {
+                ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
             }
         }
-        mBinding.playerView.setDefaultArtwork();
-        String videoUrl = step.getVideoURL();
-        if (videoUrl == null || videoUrl.isEmpty()) {
-            mBinding.playerView.setVisibility(View.GONE);
-        } else {
-            initializePlayer();
+    }
+
+    private void bindThumbnailImage(String thumbnailURL) {
+        loadDefaultArtwork();
+        if (thumbnailURL != null && !thumbnailURL.isEmpty()) {
+            Picasso.get().load(thumbnailURL).into(new Target() {
+                @Override
+                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                    mBinding.playerView.setDefaultArtwork(bitmap);
+                }
+
+                @Override
+                public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+                    loadDefaultArtwork();
+                }
+
+                @Override
+                public void onPrepareLoad(Drawable placeHolderDrawable) {
+                }
+            });
         }
+    }
+
+    private void loadDefaultArtwork() {
+        mBinding.playerView.setDefaultArtwork(BitmapFactory.decodeResource(
+                getContext().getResources(),
+                R.drawable.list_item_place_holder));
     }
 
     public void setStep(int stepId) {
         mStepId = stepId;
     }
 
-    private void initializePlayer() {
+    private void bindPlayer(String videoURL) {
         if (mExoPlayer == null) {
             TrackSelection.Factory videoTrackSelectionFactory =
                     new AdaptiveTrackSelection.Factory(bandwidthMeter);
@@ -162,19 +189,26 @@ public class StepDetailFragment extends Fragment {
             trackSelector = new DefaultTrackSelector(videoTrackSelectionFactory);
 
             mExoPlayer = ExoPlayerFactory.newSimpleInstance(mContext, trackSelector);
-
             mBinding.playerView.setPlayer(mExoPlayer);
 
-            mExoPlayer.setPlayWhenReady(shouldAutoPlay);
-
-            DefaultExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
-
-            MediaSource mediaSource = new ExtractorMediaSource(Uri.parse(mViewModel.getVideoUrl()),
-                    mediaDataSourceFactory, extractorsFactory, null, null);
-
-            mExoPlayer.seekTo(mPlayerPosition);
-            mExoPlayer.prepare(mediaSource);
+            if (videoURL != null && !videoURL.isEmpty()) {
+                initializePlayer();
+            } else {
+                mBinding.playerView.hideController();
+            }
         }
+    }
+
+    private void initializePlayer() {
+        mExoPlayer.setPlayWhenReady(shouldAutoPlay);
+
+        DefaultExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
+
+        MediaSource mediaSource = new ExtractorMediaSource(Uri.parse(mViewModel.getVideoUrl()),
+                mediaDataSourceFactory, extractorsFactory, null, null);
+
+        mExoPlayer.seekTo(mPlayerPosition);
+        mExoPlayer.prepare(mediaSource);
     }
 
     @Override

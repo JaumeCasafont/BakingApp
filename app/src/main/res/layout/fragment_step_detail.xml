@@ -30,23 +30,13 @@
             tools:layout_editor_absoluteY="256dp" />
 
         <TextView
-            android:id="@+id/step_short_description"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:layout_marginTop="@dimen/vertical_medium_margin"
-            android:layout_marginStart="@dimen/horizontal_medium_margin"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/horizontalHalf"/>
-
-        <TextView
             android:id="@+id/step_description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/vertical_medium_margin"
             android:layout_marginStart="@dimen/horizontal_medium_margin"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/step_short_description"/>
+            app:layout_constraintTop_toBottomOf="@id/horizontalHalf"/>
 
     </android.support.constraint.ConstraintLayout>
 </layout>
