@@ -42,11 +42,14 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 
+import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
+import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
 import static com.jcr.bakingapp.ui.recipes.RecipesListActivity.EXTRA_RECIPE_ID;
 
 public class StepDetailFragment extends Fragment {
 
     private static final String STATE_PLAYER_POSITION = "player_position";
+    private static final String STATE_PLAYER_READY = "player_ready";
     private Context mContext;
     private StepDetailViewModel mViewModel;
     private int mStepId = 0;
@@ -77,6 +80,7 @@ public class StepDetailFragment extends Fragment {
                 (TransferListener<? super DataSource>) bandwidthMeter);
         if (savedInstanceState != null) {
             mPlayerPosition = savedInstanceState.getLong(STATE_PLAYER_POSITION);
+            shouldAutoPlay = savedInstanceState.getBoolean(STATE_PLAYER_READY);
         }
     }
 
@@ -127,10 +131,17 @@ public class StepDetailFragment extends Fragment {
     }
 
     private void bindStep(Step step) {
-        if (!getResources().getBoolean(R.bool.isTablet)) {
+        if (getResources().getBoolean(R.bool.isTablet)) {
+            mBinding.stepDescription.setText(step.getDescription());
+        } else {
             ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(String.format(
                     getString(R.string.steps_detail_toolbar), String.valueOf(step.getId())));
+            if (getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT) {
+                mBinding.stepShortDescription.setText(step.getShortDescription());
+                mBinding.stepDescription.setText(step.getDescription());
+            }
         }
+        mBinding.playerView.setDefaultArtwork();
         String videoUrl = step.getVideoURL();
         if (videoUrl == null || videoUrl.isEmpty()) {
             mBinding.playerView.setVisibility(View.GONE);
@@ -171,6 +182,7 @@ public class StepDetailFragment extends Fragment {
         super.onPause();
         if (mExoPlayer != null) {
             mPlayerPosition = mExoPlayer.getCurrentPosition();
+            shouldAutoPlay = mExoPlayer.getPlayWhenReady();
         }
         if (Util.SDK_INT <= 23) {
             releasePlayer();
@@ -190,11 +202,11 @@ public class StepDetailFragment extends Fragment {
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putLong(STATE_PLAYER_POSITION, mPlayerPosition);
+        outState.putBoolean(STATE_PLAYER_READY, shouldAutoPlay);
     }
 
     private void releasePlayer() {
         if (mExoPlayer != null) {
-            shouldAutoPlay = mExoPlayer.getPlayWhenReady();
             mExoPlayer.release();
             mExoPlayer = null;
             trackSelector = null;
