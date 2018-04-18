@@ -17,7 +17,6 @@ public class StepDetailViewModel extends ViewModel {
     private Step mStep;
     private int mRecipeId;
     private int mStepId;
-    private String videoUrl;
 
     public StepDetailViewModel(RecipesRepository repository, int recipeId, int stepId) {
         mRepository = repository;
@@ -29,12 +28,11 @@ public class StepDetailViewModel extends ViewModel {
         return mRepository.getStep(mRecipeId, mStepId)
                 .map(step -> {
                     mStep = step;
-                    videoUrl = mStep.getVideoURL();
                     return mStep;
                 });
     }
 
-    public String getVideoUrl() {
-        return videoUrl;
+    public Step getRetainedStep() {
+        return mStep;
     }
 }

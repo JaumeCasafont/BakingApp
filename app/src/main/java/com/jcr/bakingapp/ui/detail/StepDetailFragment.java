@@ -71,6 +71,8 @@ public class StepDetailFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        setRetainInstance(true);
+
         shouldAutoPlay = true;
         bandwidthMeter = new DefaultBandwidthMeter();
         mediaDataSourceFactory = new DefaultDataSourceFactory(mContext,
@@ -121,27 +123,33 @@ public class StepDetailFragment extends Fragment {
     }
 
     private void initDisposable() {
-        mDisposable.add(mViewModel.getStep()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::bindStep));
-        mBinding.executePendingBindings();
+        if (mViewModel.getRetainedStep() == null) {
+            mDisposable.add(mViewModel.getStep()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(this::bindStep));
+            mBinding.executePendingBindings();
+        } else {
+            bindStep(mViewModel.getRetainedStep());
+        }
     }
 
     private void bindStep(Step step) {
         bindTexts(step.getShortDescription(), step.getDescription());
 
-        bindThumbnailImage(step.getThumbnailURL());
-
-        bindPlayer(step.getVideoURL());
+        if (mExoPlayer == null) {
+            bindThumbnailImage(step.getThumbnailURL());
+            bindPlayer(step.getVideoURL());
+        } else {
+            mBinding.playerView.setPlayer(mExoPlayer);
+        }
     }
 
     private void bindTexts(String shortDescription, String description) {
         if (getResources().getBoolean(R.bool.isTablet)) {
             mBinding.stepDescription.setText(description);
         } else {
-            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(String.format(
-                    getString(R.string.steps_detail_toolbar), shortDescription));
+            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(shortDescription);
             if (getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT) {
                 mBinding.stepDescription.setText(description);
             } else {
@@ -182,29 +190,27 @@ public class StepDetailFragment extends Fragment {
     }
 
     private void bindPlayer(String videoURL) {
-        if (mExoPlayer == null) {
-            TrackSelection.Factory videoTrackSelectionFactory =
-                    new AdaptiveTrackSelection.Factory(bandwidthMeter);
+        TrackSelection.Factory videoTrackSelectionFactory =
+                new AdaptiveTrackSelection.Factory(bandwidthMeter);
 
-            trackSelector = new DefaultTrackSelector(videoTrackSelectionFactory);
+        trackSelector = new DefaultTrackSelector(videoTrackSelectionFactory);
 
-            mExoPlayer = ExoPlayerFactory.newSimpleInstance(mContext, trackSelector);
-            mBinding.playerView.setPlayer(mExoPlayer);
+        mExoPlayer = ExoPlayerFactory.newSimpleInstance(mContext, trackSelector);
+        mBinding.playerView.setPlayer(mExoPlayer);
 
-            if (videoURL != null && !videoURL.isEmpty()) {
-                initializePlayer();
-            } else {
-                mBinding.playerView.hideController();
-            }
+        if (videoURL != null && !videoURL.isEmpty()) {
+            initializePlayer(videoURL);
+        } else {
+            mBinding.playerView.hideController();
         }
     }
 
-    private void initializePlayer() {
+    private void initializePlayer(String videoURL) {
         mExoPlayer.setPlayWhenReady(shouldAutoPlay);
 
         DefaultExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
 
-        MediaSource mediaSource = new ExtractorMediaSource(Uri.parse(mViewModel.getVideoUrl()),
+        MediaSource mediaSource = new ExtractorMediaSource(Uri.parse(videoURL),
                 mediaDataSourceFactory, extractorsFactory, null, null);
 
         mExoPlayer.seekTo(mPlayerPosition);
@@ -218,7 +224,7 @@ public class StepDetailFragment extends Fragment {
             mPlayerPosition = mExoPlayer.getCurrentPosition();
             shouldAutoPlay = mExoPlayer.getPlayWhenReady();
         }
-        if (Util.SDK_INT <= 23) {
+        if (Util.SDK_INT <= 23 && !getActivity().isChangingConfigurations()) {
             releasePlayer();
         }
     }
@@ -226,7 +232,7 @@ public class StepDetailFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
-        if (Util.SDK_INT > 23) {
+        if (Util.SDK_INT > 23 && !getActivity().isChangingConfigurations()) {
             releasePlayer();
         }
         mDisposable.clear();
