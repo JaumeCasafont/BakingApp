@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
@@ -34,6 +35,12 @@ public class RecipesListActivityTest {
     public void loadResults() {
         onView(withId(R.id.recipes_rv)).perform(RecyclerViewActions.scrollToPosition(3));
         onView(listMatcher().atPosition(3)).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void onRecipeClick_openRecipeSteps() {
+        onView(listMatcher().atPosition(0)).perform(click());
+        onView(withId(R.id.ingredients_title_tv)).check(matches(isDisplayed()));
     }
 
     @NonNull
