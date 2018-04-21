@@ -16,7 +16,7 @@ public class RecipesRepository {
     private static RecipesRepository sInstance;
     private final RecipesNetworkDataSource mNetworkDataSource;
     private final RecipeDao mDao;
-    private boolean mInitialized = false;
+    private int currentRecipeId;
 
     private RecipesRepository(RecipesNetworkDataSource dataSource,
                               RecipeDao dao) {
@@ -44,7 +44,12 @@ public class RecipesRepository {
     }
 
     public Flowable<Recipe> getRecipe(int recipeId) {
-        return mDao.getRecipe(recipeId);
+        currentRecipeId = recipeId;
+        return mDao.getRecipe(currentRecipeId);
+    }
+
+    public Flowable<Recipe> getCurrentRecipe() {
+        return mDao.getRecipe(currentRecipeId);
     }
 
     public Flowable<Step> getStep(int recipeId, int stepId) {

@@ -19,6 +19,7 @@ import com.jcr.bakingapp.R;
 import com.jcr.bakingapp.data.models.Ingredient;
 import com.jcr.bakingapp.data.models.Recipe;
 import com.jcr.bakingapp.databinding.FragmentStepsBinding;
+import com.jcr.bakingapp.widget.IngredientsListService;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -137,6 +138,7 @@ public class StepsFragment extends Fragment {
             mBinding.stepsLayout.stepsRv.getViewTreeObserver().addOnGlobalLayoutListener(
                     () -> setStepItemColor(mStepId, R.color.colorPrimaryLight));
         }
+        IngredientsListService.startActionUpdateIngredientsList(getContext());
     }
 
     @Override
