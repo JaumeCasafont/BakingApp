@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">BakingApp</string>
     <string name="servings_text">Servings %s</string>
+    <string name="error_message_text">Couldn\'t retrieve recipes, please try again later.</string>
     <string name="ingredients_title">Ingredients:</string>
     <string name="steps_title">Steps:</string>
 

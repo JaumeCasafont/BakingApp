@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 
 import com.jcr.bakingapp.Injection;
 import com.jcr.bakingapp.R;
@@ -72,17 +73,31 @@ public class RecipesListActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-
         mDisposable.add(mViewModel.getRecipesList()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(recipes -> {
+                    showRecipes();
                     mAdapter.swapRecipes(recipes);
                     if (listState != null) {
                         mBinding.recipesRv.getLayoutManager().onRestoreInstanceState(listState);
                     }
+                }, throwable -> {
+                    showError();
                 }));
         mBinding.executePendingBindings();
+    }
+
+    private void showRecipes() {
+        mBinding.loadingPb.setVisibility(View.GONE);
+        mBinding.errorMessage.setVisibility(View.GONE);
+        mBinding.recipesRv.setVisibility(View.VISIBLE);
+    }
+
+    private void showError() {
+        mBinding.loadingPb.setVisibility(View.GONE);
+        mBinding.errorMessage.setVisibility(View.VISIBLE);
+        mBinding.recipesRv.setVisibility(View.GONE);
     }
 
     @Override

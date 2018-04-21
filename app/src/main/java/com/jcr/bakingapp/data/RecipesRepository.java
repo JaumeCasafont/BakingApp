@@ -16,6 +16,7 @@ public class RecipesRepository {
     private static RecipesRepository sInstance;
     private final RecipesNetworkDataSource mNetworkDataSource;
     private final RecipeDao mDao;
+    private boolean shouldRefresh = true;
     private int currentRecipeId;
 
     private RecipesRepository(RecipesNetworkDataSource dataSource,
@@ -37,10 +38,19 @@ public class RecipesRepository {
     }
 
     public Flowable<List<Recipe>> getRecipesList() {
-        return mNetworkDataSource.getRecipesList()
-                .subscribeOn(Schedulers.io())
-                .doOnNext(mDao::bulkInsert)
-                .observeOn(AndroidSchedulers.mainThread());
+        return mDao.getRecipesList()
+                .flatMap(localResult -> {
+                    if (localResult.isEmpty() || shouldRefresh) {
+                        shouldRefresh = false;
+                        return mNetworkDataSource.getRecipesList()
+                                .subscribeOn(Schedulers.io())
+                                .doOnNext(mDao::bulkInsert)
+                                .flatMap(x -> mDao.getRecipesList())
+                                .observeOn(AndroidSchedulers.mainThread());
+                    } else {
+                        return Flowable.just(localResult);
+                    }
+                });
     }
 
     public Flowable<Recipe> getRecipe(int recipeId) {
