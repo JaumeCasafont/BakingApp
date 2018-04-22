@@ -73,6 +73,8 @@ dependencies {
     //Testing
     implementation "android.arch.core:core-testing:$persistence_version"
 
+    implementation "com.android.support.test.espresso:espresso-idling-resource:$espresso_version"
+
     testImplementation "org.mockito:mockito-core:$mockito_version"
     androidTestImplementation 'com.linkedin.dexmaker:dexmaker-mockito:2.2.0'
     androidTestImplementation "org.mockito:mockito-core:$mockito_version", { exclude group: 'net.bytebuddy' }
