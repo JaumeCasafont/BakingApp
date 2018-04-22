@@ -7,4 +7,6 @@
 
     <string name="steps_detail_toolbar">Step %s</string>
     <string name="appwidget_default_text">Ingredients list</string>
+
+    <string name="appwidget_notification_channel_name">Channel BakingApp widget</string>
 </resources>
