@@ -63,6 +63,8 @@ public class StepsFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        setRetainInstance(true);
+
         if (savedInstanceState != null) {
             mStepId = savedInstanceState.getInt(STEP_ID, 0);
         }
@@ -120,19 +122,24 @@ public class StepsFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        mDisposable.add(mViewModel.getRecipe()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::bindRecipe));
-        mBinding.executePendingBindings();
+        if (mViewModel.getRetainedRecipe() == null) {
+            mDisposable.add(mViewModel.getRecipe()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(this::bindRecipe));
+            mBinding.executePendingBindings();
+        } else {
+            bindRecipe(mViewModel.getRetainedRecipe());
+        }
     }
 
     private void bindRecipe(Recipe recipe) {
         ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(recipe.getName());
-        mBinding.ingredientsLayout.ingredientsTv.setText("");
+        StringBuilder stringBuilder = new StringBuilder();
         for (Ingredient ingredient : recipe.getIngredients()) {
-            mBinding.ingredientsLayout.ingredientsTv.append("· " + ingredient.toString() + "\n");
+            stringBuilder.append("· ").append(ingredient.toString()).append("\n");
         }
+        mBinding.ingredientsLayout.ingredientsTv.setText(stringBuilder.toString());
         mAdapter.setSteps(recipe.getSteps());
         if (getResources().getBoolean(R.bool.isTablet)) {
             mBinding.stepsLayout.stepsRv.getViewTreeObserver().addOnGlobalLayoutListener(

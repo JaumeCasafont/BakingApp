@@ -29,4 +29,8 @@ public class StepsListViewModel extends ViewModel {
                     return mRecipe;
                 });
     }
+
+    public Recipe getRetainedRecipe() {
+        return mRecipe;
+    }
 }
