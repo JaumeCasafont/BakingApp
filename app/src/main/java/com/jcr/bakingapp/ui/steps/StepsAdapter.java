@@ -17,12 +17,14 @@ public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.StepViewHold
 
     private final Context mContext;
     private final OnStepClickHandler mClickHandler;
+    private int mSelectedItemPosition = 0;
 
     private List<Step> mSteps;
 
-    public StepsAdapter(Context context, OnStepClickHandler handler) {
+    public StepsAdapter(Context context, OnStepClickHandler handler, int selectedPosition) {
         mContext = context;
         mClickHandler = handler;
+        mSelectedItemPosition = selectedPosition;
     }
 
     @NonNull
@@ -34,11 +36,20 @@ public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.StepViewHold
 
     @Override
     public void onBindViewHolder(@NonNull StepViewHolder holder, int position) {
+        if (mSelectedItemPosition == position && mContext.getResources().getBoolean(R.bool.isTablet)) {
+            holder.itemView.setBackgroundColor(mContext.getResources().getColor(R.color.colorPrimaryLight));
+        } else {
+            holder.itemView.setBackgroundColor(mContext.getResources().getColor(R.color.colorPrimary));
+        }
         Step step = mSteps.get(position);
         holder.stepShortDescription.setText(step.getShortDescription());
         holder.itemView.setOnClickListener(view -> {
             if (mClickHandler != null) {
-               mClickHandler.onClick(step.getId());
+                mClickHandler.onClick(step.getId(), position);
+                if (position != mSelectedItemPosition && mContext.getResources().getBoolean(R.bool.isTablet)) {
+                    mSelectedItemPosition = position;
+                    notifyDataSetChanged();
+                }
             }
         });
     }
@@ -55,7 +66,7 @@ public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.StepViewHold
     }
 
     interface OnStepClickHandler {
-        void onClick(int stepId);
+        void onClick(int stepId, int position);
     }
 
     class StepViewHolder extends RecyclerView.ViewHolder {

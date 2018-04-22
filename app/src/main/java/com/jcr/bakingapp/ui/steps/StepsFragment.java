@@ -12,7 +12,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 
 import com.jcr.bakingapp.Injection;
 import com.jcr.bakingapp.R;
@@ -36,7 +35,7 @@ public class StepsFragment extends Fragment {
     private FragmentStepsBinding mBinding;
     private StepsListViewModel mViewModel;
     private StepsAdapter mAdapter;
-    private int mStepId;
+    private int mStepPosition = 0;
 
     private final CompositeDisposable mDisposable = new CompositeDisposable();
 
@@ -66,7 +65,7 @@ public class StepsFragment extends Fragment {
         setRetainInstance(true);
 
         if (savedInstanceState != null) {
-            mStepId = savedInstanceState.getInt(STEP_ID, 0);
+            mStepPosition = savedInstanceState.getInt(STEP_ID, 0);
         }
     }
 
@@ -93,30 +92,15 @@ public class StepsFragment extends Fragment {
     }
 
     private void initRecyclerView() {
-        mAdapter = new StepsAdapter(getContext(), this::onStepSelected);
+        mAdapter = new StepsAdapter(getContext(), this::onStepSelected, mStepPosition);
         mBinding.stepsLayout.stepsRv.setLayoutManager(new LinearLayoutManager(
                 getContext(), LinearLayoutManager.VERTICAL, false));
         mBinding.stepsLayout.stepsRv.setAdapter(mAdapter);
     }
 
-    private void onStepSelected(int stepId) {
-        mStepId = stepId;
-        if (getResources().getBoolean(R.bool.isTablet)) {
-            restoreColors();
-            setStepItemColor(stepId, R.color.colorPrimaryLight);
-        }
+    private void onStepSelected(int stepId, int position) {
+        mStepPosition = position;
         mCallback.onStepSelected(stepId);
-    }
-
-    private void restoreColors() {
-        for (int i = 0; i < mAdapter.getItemCount(); i++) {
-            setStepItemColor(i, R.color.colorPrimary);
-        }
-    }
-
-    private void setStepItemColor(int step, int color) {
-        mBinding.stepsLayout.stepsRv.getLayoutManager().findViewByPosition(step)
-                .setBackgroundColor(getResources().getColor(color));
     }
 
     @Override
@@ -141,10 +125,6 @@ public class StepsFragment extends Fragment {
         }
         mBinding.ingredientsLayout.ingredientsTv.setText(stringBuilder.toString());
         mAdapter.setSteps(recipe.getSteps());
-        if (getResources().getBoolean(R.bool.isTablet)) {
-            mBinding.stepsLayout.stepsRv.getViewTreeObserver().addOnGlobalLayoutListener(
-                    () -> setStepItemColor(mStepId, R.color.colorPrimaryLight));
-        }
         IngredientsListService.startActionUpdateIngredientsList(getContext());
     }
 
@@ -158,6 +138,6 @@ public class StepsFragment extends Fragment {
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt(STEP_ID, mStepId);
+        outState.putInt(STEP_ID, mStepPosition);
     }
 }
